@@ -1,10 +1,10 @@
 fn main() {
     const INPUT: &str = include_str!("input");
-    println!("Part 1: {}", part_1(INPUT));
-    println!("Part 2: {}", part_2(INPUT));
+    println!("🎄 Part 1: {}", part_1(INPUT));
+    println!("🎅 Part 2: {}", part_2(INPUT));
 }
 
-fn part_1(input: &str) -> String {
+fn part_1(input: &str) -> u32 {
     let mut results: Vec<u32> = Vec::new();
     for line in input.lines().filter(|l| !l.is_empty()) {
         let (mut p1, mut p2) = (0, line.len().saturating_sub(1));
@@ -29,11 +29,10 @@ fn part_1(input: &str) -> String {
         }
     }
 
-    let sum: u32 = results.iter().sum();
-    return format!("{}", sum);
+    return results.iter().sum();
 }
 
-fn part_2(input: &str) -> String {
+fn part_2(input: &str) -> u32 {
     const MATCH_TERMS: [&str; 18] = [
         "1", "2", "3", "4", "5", "6", "7", "8", "9", "one", "two", "three", "four", "five", "six",
         "seven", "eight", "nine",
@@ -41,51 +40,41 @@ fn part_2(input: &str) -> String {
     let mut results: Vec<u32> = Vec::new();
 
     for line in input.lines().filter(|l| !l.is_empty()) {
-        let (mut p1, mut p2) = (0, line.len().saturating_sub(1));
-        let mut val_a: Option<&str> = None;
-        let mut val_b: Option<&str> = None;
+        let mut left: usize = 0;
+        let mut right: usize = line.len();
+        let mut first_digit: Option<&str> = None;
+        let mut second_digit: Option<&str> = None;
 
-        while val_a.is_none() || val_b.is_none() {
-            let mut temp_a: Option<&str> = None;
-            if val_a.is_none() {
-                temp_a = line.get(..p1);
-                p1 = p1.saturating_add(1);
-            }
-
-            let mut temp_b: Option<&str> = None;
-            if val_b.is_none() {
-                temp_b = line.get(p2..line.len());
-                p2 = p2.saturating_sub(1);
-            }
-
+        while first_digit.is_none() || second_digit.is_none() {
+            left = left.saturating_add(1);
+            right = right.saturating_sub(1);
             for s in MATCH_TERMS {
-                if val_a.is_none() {
-                    if let Some(x) = temp_a {
+                if first_digit.is_none() {
+                    if let Some(x) = line.get(..left) {
                         if x.contains(s) {
-                            val_a = match_substring(s)
+                            first_digit = match_substring(s);
                         }
                     }
                 }
 
-                if val_b.is_none() {
-                    if let Some(x) = temp_b {
+                if second_digit.is_none() {
+                    if let Some(x) = line.get(right..line.len()) {
                         if x.contains(s) {
-                            val_b = match_substring(s)
+                            second_digit = match_substring(s);
                         }
                     }
                 }
             }
         }
 
-        if let (Some(a), Some(b)) = (val_a, val_b) {
+        if let (Some(a), Some(b)) = (first_digit, second_digit) {
             if let Ok(num) = format!("{}{}", a, b).parse::<u32>() {
                 results.push(num)
             }
         }
     }
 
-    let sum: u32 = results.iter().sum();
-    return format!("{}", sum);
+    return results.iter().sum();
 }
 
 fn match_substring(s: &str) -> Option<&str> {
@@ -100,5 +89,24 @@ fn match_substring(s: &str) -> Option<&str> {
         "8" | "eight" => return Some("8"),
         "9" | "nine" => return Some("9"),
         _ => return None,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const INPUT: &str = include_str!("input");
+
+    #[test]
+    fn test_part_1() {
+        let input: &str = INPUT;
+        assert_eq!(part_1(input), 54927);
+    }
+
+    #[test]
+    fn test_part_2() {
+        let input: &str = INPUT;
+        assert_eq!(part_2(input), 54581);
     }
 }
