@@ -1,0 +1,11 @@
+# Rust specific files and directories
+# This will prevent Cargo.lock and target/ from being committed to your repository.
+Cargo.lock
+target/
+
+# Editor specific files and directories
+# These files and directories are specific to certain editors and can be safely ignored.
+# You may need to adjust these rules if you use a different editor.
+.idea/
+.vscode/
+.DS_Storecarg
